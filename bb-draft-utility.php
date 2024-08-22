@@ -41,7 +41,7 @@ add_action( 'admin_enqueue_scripts', function( $hook_suffix ) {
 function init_updater() {
 	$updater = new BBDraftUtility\GithubUpdater( __FILE__ );
 	$updater->set_username( 'zackpyle' );
-	$updater->set_repository( 'wp-plugin-test' );
+	$updater->set_repository( 'BBDraftUtility' );
 	$updater->set_settings( array(
 	    'requires'        => '5.1',
 	    'tested'          => '6.6.1',
