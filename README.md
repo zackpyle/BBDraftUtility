@@ -18,3 +18,5 @@ You can click on the Unpublished Changes link from the post list to bring up a m
 
 After you schedule a draft, a calendar icon will appear next to the Unpublished Changes link. The scheduled date/time will appear in the modal and when you hover over the calendar icon.
 ![Screenshot 2024-08-21 at 13 23 27](https://github.com/user-attachments/assets/67607031-dd25-484e-bdfc-3f0bd5500179)
+
+Inspired by <a href="https://gist.github.com/Pross/0b517612bb1d1dfb17083b9b32628b82">@pross's gist</a>
