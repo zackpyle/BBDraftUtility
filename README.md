@@ -7,8 +7,9 @@ You will be notified that there is a saved Beaver Builder draft in the following
 ![Screenshot 2024-08-21 at 13 22 30](https://github.com/user-attachments/assets/e8e9da43-8602-43d5-9f5f-11a6161d3657)
 2. In the post's edit screen, it will display this warning:
 ![Screenshot 2024-08-21 at 13 23 44](https://github.com/user-attachments/assets/7c9fff7f-3663-402b-a280-aa07b33c6062)
-3. The green Beaver Builder status dot will be yellow instead of green in the row actions and in the admin bar
+3. The green Beaver Builder status dot will be yellow instead of green in the row actions
 ![Screenshot 2024-08-21 at 13 22 30](https://github.com/user-attachments/assets/98a6aae3-c089-4b2b-89ea-fd0f56e6dd94)
+<br>and in the admin bar<br>
 ![Screenshot 2024-08-21 at 13 25 02](https://github.com/user-attachments/assets/5a4db617-d93e-4590-8b3d-7066d4ae21a5)
 
 ## Schedule Drafts to Publish
