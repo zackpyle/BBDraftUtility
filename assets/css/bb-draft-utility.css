@@ -18,6 +18,12 @@
     padding: 10px 20px;
     border: none;
     cursor: pointer;
+	border: 1px solid #0073aa;
+	transition: all .2s ease-in-out;
+}
+#fl-schedule-changes .date input[type="submit"]:is(:hover, :focus-visible){
+	background: white;
+	color: #0073aa;
 }
 
 .ui-tooltip {
@@ -41,8 +47,22 @@
 }
 #delete-unpublished-draft, #remove-scheduled-publishing {
     border: 1px solid currentColor;
-    padding: 5px 10px;
+    padding: 5px 15px;
+	color: #0073aa;
+	cursor: pointer;
+	transition: all .2s ease-in-out;
 }
 #delete-unpublished-draft{
 	color: #d63638;
 }
+#remove-scheduled-publishing:is(:hover, :focus-visible){
+	background-color: #0073aa;
+	color: white;
+	border: 1px solid #0073aa;
+}
+#delete-unpublished-draft:is(:hover, :focus-visible){
+	background-color: #d63638;
+	color: white;
+	border: 1px solid #d63638;
+}
+

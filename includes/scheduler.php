@@ -14,7 +14,7 @@ add_action( 'admin_footer', function() {
                 <input type="submit" value="Schedule">
 				<div class="draft-alt-btns">
 					<button id="remove-scheduled-publishing">Unschedule</button>
-                	<button id="delete-unpublished-draft">Delete Unpublished Draft</button>
+                	<button id="delete-unpublished-draft">Delete Saved Draft</button>
 				</div>
 			</div>
         </div>';
@@ -56,7 +56,7 @@ add_action( 'wp_ajax_fl_schedule_changes', function() {
     $current_time = strtotime( current_time( 'Y-m-d H:i:s' ) );
 
     if ( ! $timestamp || $timestamp <= $current_time ) {
-        bb_draft_utility_log( "Failed to schedule: Invalid or past date/time. Post ID: $post_id, Scheduled Time: $scheduled_time", 'error' );
+        bb_draft_utility_log( "Failed to schedule draft: Invalid or past date/time. Post ID: $post_id, Scheduled Time: $scheduled_time", 'error' );
         wp_send_json_error( 'Invalid or past date/time.' );
     }
 
@@ -69,10 +69,10 @@ add_action( 'wp_ajax_fl_schedule_changes', function() {
     if ( $event_scheduled ) {
         // Store the scheduled time in post meta for reference
         update_post_meta( $post_id, '_fl_builder_schedule', $scheduled_time );
-        bb_draft_utility_log( "Scheduled event for Post ID: $post_id. Scheduled Time: $scheduled_time.", 'success' );
+        bb_draft_utility_log( "Scheduled draft to for Post ID: $post_id. Scheduled Time: $scheduled_time.", 'success' );
         wp_send_json_success( 'Changes scheduled successfully.' );
     } else {
-        bb_draft_utility_log( "Failed to schedule event. Post ID: $post_id, Scheduled Time: $scheduled_time (timestamp: $timestamp)", 'error' );
+        bb_draft_utility_log( "Failed to schedule for Post ID: $post_id, Scheduled Time: $scheduled_time (timestamp: $timestamp)", 'error' );
         wp_send_json_error( 'Failed to schedule event.' );
     }
 });
@@ -114,14 +114,31 @@ add_action( 'wp_ajax_fl_delete_draft', function() {
     delete_post_meta( $post_id, '_fl_builder_schedule' );
     wp_clear_scheduled_hook( 'publish_bb_draft_changes', array( $post_id ) );
 
-    delete_post_meta( $post_id, '_fl_builder_draft' );
-    delete_post_meta( $post_id, '_fl_builder_draft_settings' );
+    // Delete draft data
+    $deleted_draft = delete_post_meta( $post_id, '_fl_builder_draft' );
+    $deleted_draft_settings = delete_post_meta( $post_id, '_fl_builder_draft_settings' );
 
-    bb_draft_utility_log( "Deleted unpublished draft for Post ID: $post_id.", 'success' );
+    // Log what was actually deleted
+    if ( $deleted_draft ) {
+        //bb_draft_utility_log( "Successfully deleted '_fl_builder_draft' for Post ID: $post_id.", 'success' );
+    } else {
+        bb_draft_utility_log( "Failed to delete '_fl_builder_draft' for Post ID: $post_id.", 'error' );
+    }
 
-    wp_send_json_success( 'Unpublished draft deleted.' );
+    if ( $deleted_draft_settings ) {
+        //bb_draft_utility_log( "Successfully deleted '_fl_builder_draft_settings' for Post ID: $post_id.", 'success' );
+    } else {
+        bb_draft_utility_log( "Failed to delete '_fl_builder_draft_settings' for Post ID: $post_id.", 'error' );
+    }
+
+    // Only send success response if both meta fields were deleted
+    if ( $deleted_draft && $deleted_draft_settings ) {
+		bb_draft_utility_log( "Deleted saved draft for Post ID: $post_id.", 'success' );
+        wp_send_json_success( 'Saved draft deleted.' );
+    } else {
+        wp_send_json_error( 'Failed to delete the draft completely.' );
+    }
 });
-
 
 
 // Cron event to publish draft changes

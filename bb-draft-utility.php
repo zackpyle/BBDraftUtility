@@ -2,7 +2,7 @@
 /*
 Plugin Name: Beaver Builder Drafts Utility
 Description: Provides utilities for Beaver Builder drafts, including scheduling and draft notices.
-Version: 1.1
+Version: 1.2
 Author: PYLE/DIGITAL
 */
 
@@ -10,7 +10,9 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
-define( 'BB_DRAFT_UTILITY_VERSION', '1.1' );
+define( 'BB_DRAFT_UTILITY_VERSION', '1.2' );
+define( 'BB_DRAFT_UTILITY_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+
 
 // Include the Draft Notices functionality
 include_once plugin_dir_path( __FILE__ ) . 'includes/draft-notices.php';
@@ -21,6 +23,11 @@ include_once plugin_dir_path( __FILE__ ) . 'includes/scheduler.php';
 // Include the plugin update functionality
 include_once plugin_dir_path( __FILE__ ) . 'includes/GithubUpdater.php';
 
+
+function bb_draft_utility_should_enable_scheduling() {
+    // Allow scheduling by default, but this can be overridden using the filter
+    return apply_filters( 'bb_draft_utility_enable_scheduling', true );
+}
 // Enqueue Scripts and Styles
 add_action( 'admin_enqueue_scripts', function( $hook_suffix ) {
     // Only load on specific admin pages
@@ -34,6 +41,11 @@ add_action( 'admin_enqueue_scripts', function( $hook_suffix ) {
         // Enqueue the plugin's JavaScript and CSS with versioning for cache busting
         wp_enqueue_script( 'bb-draft-utility-js', plugin_dir_url( __FILE__ ) . 'assets/js/bb-draft-utility.js', array( 'jquery', 'jquery-ui-dialog', 'jquery-ui-tooltip' ), BB_DRAFT_UTILITY_VERSION, true );
         wp_enqueue_style( 'bb-draft-utility-css', plugin_dir_url( __FILE__ ) . 'assets/css/bb-draft-utility.css', array( 'wp-jquery-ui-dialog' ), BB_DRAFT_UTILITY_VERSION );
+
+		// Localize script with data about the scheduling filter
+        wp_localize_script( 'bb-draft-utility-js', 'bbDraftUtility', array(
+            'enableScheduling' => bb_draft_utility_should_enable_scheduling(),
+        ));
     }
 });
 
