@@ -47,7 +47,7 @@
     transition-duration: .2s;
 }
 
-.bb-draft-modal .ui-dialog-buttonpane button.continue-editing-btn:is(:hover, :focus-visible) {
+.bb-draft-modal .ui-dialog-buttonpane button:is(:hover, :focus-visible) {
     background-color: var(--fl-builder-selected-color) !important;
 	border: 2px solid var(--fl-builder-selected-color) !important;
 }
@@ -66,14 +66,20 @@
 button.delete-draft-btn{
 	background: transparent !important;
 	border: 2px solid #d05127 !important;
+	color: #222 !important;
 }
-button.delete-draft-btn:is(:hover, :focus-visible){
+.bb-draft-modal .ui-dialog-buttonpane button.delete-draft-btn:is(:hover, :focus-visible) {
 	background: #d05127 !important;
+	border: 2px solid #d05127 !important;
+	color: white !important;
 }
 
 .ui-widget-overlay{
 	background: black !important;
 	opacity: .35 !important;
+}
+.bb-draft-modal.ui-dialog .ui-widget-content{
+    border-color: var(--fl-builder-outline-color) !important;
 }
 
 
@@ -83,4 +89,7 @@ body.fl-builder-ui-skin--dark .bb-draft-modal .ui-widget-content{
     background: #23282d !important;
     color: #a7b1bb !important;
 	border-color: var(--fl-builder-outline-color)!important;
+}
+body.fl-builder-ui-skin--dark button.delete-draft-btn{
+	color: white !important;
 }

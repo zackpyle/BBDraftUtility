@@ -1,24 +1,11 @@
 <?php
 // Scheduling: Handles scheduling Beaver Builder draft changes
 
-// Add Modal for Scheduling Draft Changes
-add_action( 'admin_footer', function() {
-    $current_server_time = current_time( 'Y-m-d\TH:i:s' ); // Get current server local time in 'Y-m-d\TH:i:s' format
 
-    echo '<div id="fl-schedule-changes" data-nonce="' . wp_create_nonce( 'fl-schedule-changes' ) . '" data-server-time="' . esc_attr( $current_server_time ) . '" style="display:none;">
-            <!-- <div class="server-time">
-                <strong>Current Server Local Time:</strong> ' . esc_html( date( 'M j, Y H:i', strtotime( $current_server_time ) ) ) . '
-            </div> -->
-            <div class="date">
-                <input type="datetime-local" id="fl-schedule-time" />
-                <input type="submit" value="Schedule">
-				<div class="draft-alt-btns">
-					<button id="remove-scheduled-publishing">Unschedule</button>
-                	<button id="delete-unpublished-draft">Delete Saved Draft</button>
-				</div>
-			</div>
-        </div>';
-});
+function bb_draft_utility_should_enable_scheduling() {
+    // Allow scheduling by default, but this can be overridden using the filter
+    return apply_filters( 'bb_draft_utility_enable_scheduling', true );
+}
 
 /**
  * Log a message to Simple History if available, and always log errors to the PHP error log.
@@ -41,7 +28,7 @@ function bb_draft_utility_log( $message, $type = 'info' ) {
 
 // Handle AJAX request for scheduling draft changes
 add_action( 'wp_ajax_fl_schedule_changes', function() {
-    check_ajax_referer( 'fl-schedule-changes', 'nonce' );
+    check_ajax_referer( 'bb_draft_utility_nonce', 'nonce' );
 
     $post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
     $scheduled_time = isset( $_POST['scheduled_time'] ) ? sanitize_text_field( $_POST['scheduled_time'] ) : '';
@@ -80,7 +67,7 @@ add_action( 'wp_ajax_fl_schedule_changes', function() {
 
 // Handle AJAX request to remove scheduled publishing
 add_action( 'wp_ajax_fl_remove_schedule', function() {
-    check_ajax_referer( 'fl-schedule-changes', 'nonce' );
+    check_ajax_referer( 'bb_draft_utility_nonce', 'nonce' );
 
     $post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
 
@@ -101,7 +88,7 @@ add_action( 'wp_ajax_fl_remove_schedule', function() {
 
 // Handle AJAX request to delete unpublished draft
 add_action( 'wp_ajax_fl_delete_draft', function() {
-    check_ajax_referer( 'fl-schedule-changes', 'nonce' );
+    check_ajax_referer( 'bb_draft_utility_nonce', 'nonce' );
 
     $post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
 
@@ -117,6 +104,8 @@ add_action( 'wp_ajax_fl_delete_draft', function() {
     // Delete draft data
     $deleted_draft = delete_post_meta( $post_id, '_fl_builder_draft' );
     $deleted_draft_settings = delete_post_meta( $post_id, '_fl_builder_draft_settings' );
+	delete_post_meta( $post_id, '_fl_builder_draft_saved_by' );
+    delete_post_meta( $post_id, '_fl_builder_draft_saved_at' );
 
     // Log what was actually deleted
     if ( $deleted_draft ) {
@@ -158,6 +147,8 @@ add_action( 'publish_bb_draft_changes', function( $post_id ) {
         // Delete the draft data as we already published it
         delete_post_meta( $post_id, '_fl_builder_draft' );
         delete_post_meta( $post_id, '_fl_builder_draft_settings' );
+		delete_post_meta( $post_id, '_fl_builder_draft_saved_by' );
+    	delete_post_meta( $post_id, '_fl_builder_draft_saved_at' );
     } else {
         // Log if there was an issue with the draft data
         bb_draft_utility_log( "Failed to publish draft changes for Post ID: $post_id. Missing draft data or settings.", 'error' );
