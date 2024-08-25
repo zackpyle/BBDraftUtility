@@ -84,4 +84,5 @@ add_filter( 'bb_draft_utility_show_saved_info', function( $show_saved_info ) {
 });
 ```
 
-Inspired by <a href="https://gist.github.com/Pross/0b517612bb1d1dfb17083b9b32628b82">@pross's gist</a>
+<hr>
+Project inspired by <a href="https://gist.github.com/Pross/0b517612bb1d1dfb17083b9b32628b82">@pross's gist</a>
