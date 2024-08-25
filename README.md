@@ -33,7 +33,7 @@ The Beaver Builder Draft Utility plugin provides several hooks that allow you to
 
 ### 1. `bb_draft_utility_enable_scheduling`
 
-This filter allows you to enable or disable the scheduling feature for drafts. By default, scheduling is enabled, but you can override this behavior.
+This filter allows you to disable the scheduling feature for drafts. By default, scheduling is enabled, but you can override this behavior by returning `false`.
 
 #### Example Usage:
 ```php
@@ -52,7 +52,7 @@ add_filter( 'bb_draft_utility_enable_scheduling', function( $enable_scheduling )
 
 This filter allows you to override the default branding name for Beaver Builder.
 - If have the agency version of Beaver Builder, this plugin will respect your white label naming.
-- If you are white labeling it in a different way, you can change the builder name using this hook since we dynamically add the name with javascript in some places.
+- If you are white labeling it in a different way, you can change the builder name using this hook since we dynamically add the name with javascript in some places where php text replacements or translations would not apply.
 
 #### Example Usage:
 ```php
@@ -69,7 +69,7 @@ add_filter( 'bb_draft_utility_branding', function( $branding ) {
 
 ### 3. `bb_draft_utility_show_saved_info`
 
-This filter determines whether to show the "Draft saved by" and "on" information in the modals. By default, this information is shown, but you can hide it if needed.
+This filter determines whether to show the draft author and date saved information in the modals. By default, this information is shown, but you can hide it if needed by returning `false`.
 
 #### Example Usage:
 ```php
