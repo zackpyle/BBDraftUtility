@@ -15,11 +15,12 @@ add_action( 'admin_enqueue_scripts', function( $hook_suffix ) {
 
         // Localize script with data about the scheduling filter
         wp_localize_script( 'bb-draft-backend-js', 'bbDraftUtility', array(
-            'enableScheduling' => bb_draft_utility_should_enable_scheduling(),
+            'enableScheduling' => bb_draft_utility_enable_scheduling(),
+            'showSavedInfo'    => bb_draft_utility_show_saved_info(),
+            'builderName'      => bb_draft_utility_branding(),
             'postId'           => get_the_ID(),
             'ajaxUrl'          => admin_url( 'admin-ajax.php' ),
-            'nonce'            => wp_create_nonce( 'bb_draft_utility_nonce' ),
-			'builderName'      => FLBuilderModel::get_branding()
+            'nonce'            => wp_create_nonce( 'bb_draft_utility_nonce' )
         ));
     }
 });

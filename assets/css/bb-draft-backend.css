@@ -3,7 +3,7 @@
 	display: inline-block;
 }
 #fl-saved-draft-modal {
-    padding: 20px;
+	padding: 20px;
 }
 .fl-saved-draft-modal .ui-dialog-title{
 	font-size: 22px;
@@ -22,23 +22,23 @@
 }
 
 #fl-saved-draft-modal-content .server-time {
-    margin-bottom: 20px;
+	margin-bottom: 20px;
 }
 
 #fl-saved-draft-modal-content .date input[type="datetime-local"] {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
+	width: 100%;
+	padding: 10px;
+	margin-bottom: 10px;
 }
 
 #fl-saved-draft-modal-content .bb-saved-draft-btn,
 #fl-saved-draft-modal-content .bb-saved-draft-btn:focus{
 	--_accent: #0073aa;
-    background-color: rgb(239, 239, 239);
-    color: var(--_accent);
-    padding: 5px 15px;
-    border: none;
-    cursor: pointer;
+	background-color: rgb(239, 239, 239);
+	color: var(--_accent);
+	padding: 5px 15px;
+	border: none;
+	cursor: pointer;
 	border: 1px solid var(--_accent);
 	transition: all .2s ease-in-out;
 	text-decoration:none;
@@ -69,17 +69,17 @@
 }
 
 .ui-tooltip {
-    background: #333;
-    color: #fff;
-    border-radius: 4px;
-    padding: 10px;
-    font-size: 12px;
-    z-index: 9999; /* High z-index to ensure it appears on top */
+	background: #333;
+	color: #fff;
+	border-radius: 4px;
+	padding: 10px;
+	font-size: 12px;
+	z-index: 9999; /* High z-index to ensure it appears on top */
 	width: fit-content;
 }
 
 .has-saved-draft .fl-builder span {
-    color: #f1c40f !important; /* Change the color to yellow */
+	color: #f1c40f !important; /* Change the color to yellow */
 }
 
 .draft-alt-btns{

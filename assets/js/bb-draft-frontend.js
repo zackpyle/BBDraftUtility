@@ -1,13 +1,13 @@
 jQuery(document).ready(function ($) {
     // Check if Beaver Builder is active
     if (typeof FLBuilder !== 'undefined' && bbDraftUtility.hasDraft) {
-		
-		// Skip showing the modal if the user came from the previous draft modal to edit the draft
-		const urlParams = new URLSearchParams(window.location.search);
+
+        // Skip showing the modal if the user came from the previous draft modal to edit the draft
+        const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('fl_saved_draft')) {
             return;
         }
-		
+
         // Function to show a notification
         function showNotification(message, title = 'Notification', callback = null, modalToClose = null) {
             // Check if the notification modal exists, if not, create it
@@ -40,9 +40,9 @@ jQuery(document).ready(function ($) {
                     }
                 },
                 closeOnEscape: true,
-				open: function(event, ui) {
-					$(".ui-dialog-titlebar-close", ui.dialog | ui).hide(); // Hide the close button
-				},
+                open: function(event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide(); // Hide the close button
+                },
                 draggable: false,
                 resizable: false,
                 width: 500,
@@ -54,7 +54,7 @@ jQuery(document).ready(function ($) {
         let modalContent = '<p>This page has a saved draft.';
 
         // Add information about who saved the draft and when
-        if (bbDraftUtility.draftSavedBy && bbDraftUtility.draftSavedAt) {
+        if (bbDraftUtility.showSavedInfo && bbDraftUtility.draftSavedBy && bbDraftUtility.draftSavedAt) {
             modalContent += `<p>Draft saved by <strong>${bbDraftUtility.draftSavedBy}</strong> on <strong>${bbDraftUtility.draftSavedAt}</strong>.</p>`;
         }
 
@@ -102,7 +102,7 @@ jQuery(document).ready(function ($) {
             dialogClass: "bb-draft-modal",
             draggable: false,
             resizable: false,
-			create: function() {
+            create: function() {
                 // Add custom classes to buttons
                 $(".ui-dialog-buttonpane button:contains('Edit Saved Draft')").addClass("continue-editing-btn");
                 $(".ui-dialog-buttonpane button:contains('Delete Saved Draft')").addClass("delete-draft-btn");

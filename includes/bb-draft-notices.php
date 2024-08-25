@@ -83,17 +83,17 @@ add_action( 'admin_notices', function() {
     if ( get_post_meta( $post->ID, '_fl_builder_enabled', true ) ) {
         $draft = get_post_meta( $post->ID, '_fl_builder_draft', true );
         $live  = get_post_meta( $post->ID, '_fl_builder_data', true );
-		$scheduled_time = get_post_meta( $post->ID, '_fl_builder_schedule', true );
-		$saved_by = get_post_meta( $post->ID, '_fl_builder_draft_saved_by', true );
+        $scheduled_time = get_post_meta( $post->ID, '_fl_builder_schedule', true );
+        $saved_by = get_post_meta( $post->ID, '_fl_builder_draft_saved_by', true );
         $saved_at = get_post_meta( $post->ID, '_fl_builder_draft_saved_at', true );
 
         if ( '' !== $draft && $draft != $live ) {
             $message = sprintf(
                 __( 'Notice: There is an unpublished %s Saved Draft', 'fl-builder' ),
-                FLBuilderModel::get_branding()
+                bb_draft_utility_branding()
             );
 
-			// Append "Saved by" and "Saved at" information
+            // Append "Saved by" and "Saved at" information
             if ( $saved_by && $saved_at ) {
                 // Get user information
                 $user_info = get_userdata( $saved_by );
@@ -102,8 +102,8 @@ add_action( 'admin_notices', function() {
 
                 $message .= sprintf( '. Saved by %s on %s.', esc_html( $saved_by_name ), esc_html( $formatted_saved_at ) );
             }
-			
-			// If there is a scheduled time, append it to the message
+
+            // If there is a scheduled time, append it to the message
             if ( $scheduled_time ) {
                 $formatted_time = date( 'M j, Y H:i', strtotime( $scheduled_time ) );
                 $message .= sprintf( ' It is scheduled to be published on %s.', esc_html( $formatted_time ) );

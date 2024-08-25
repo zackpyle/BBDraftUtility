@@ -28,6 +28,7 @@ function bb_draft_maybe_load_scripts() {
                 'postId'         => $post->ID,
                 'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
                 'nonce'          => wp_create_nonce( 'bb_draft_utility_nonce' ),
+                'showSavedInfo'  => bb_draft_utility_show_saved_info(),
                 'scheduledTime'  => $scheduled_time ? date( 'M j, Y H:i', strtotime( $scheduled_time ) ) : '', // Format the scheduled time
                 'draftSavedBy'   => $saved_by_name,
                 'draftSavedAt'   => $draft_saved_at ? date( 'M j, Y H:i', strtotime( $draft_saved_at ) ) : ''

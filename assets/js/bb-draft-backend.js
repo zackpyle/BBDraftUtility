@@ -49,7 +49,7 @@ jQuery(document).ready(function ($) {
                     'min-width': '300px',
                     'max-width': '600px'
                 });
-				// Replace the dialog title with an <h1> tag
+                // Replace the dialog title with an <h1> tag
                 const titleBar = $(this).closest('.ui-dialog').find('.ui-dialog-title');
                 titleBar.replaceWith(`<h1 class="ui-dialog-title">${titleBar.text()}</h1>`);
             }
@@ -113,13 +113,13 @@ jQuery(document).ready(function ($) {
         });
     }
 
-	// Loop through each element with the class '.fl-saved-draft' and add the 'has-saved-draft' class
-	$('.fl-saved-draft').each(function () {
-		const postId = $(this).data('post-id');
-		if (postId) {
-			$(`#post-${postId}`).addClass('has-saved-draft');
-		}
-	});
+    // Loop through each element with the class '.fl-saved-draft' and add the 'has-saved-draft' class
+    $('.fl-saved-draft').each(function () {
+        const postId = $(this).data('post-id');
+        if (postId) {
+            $(`#post-${postId}`).addClass('has-saved-draft');
+        }
+    });
 
     // Declare modal variable globally within the script
     let modal;
@@ -131,10 +131,10 @@ jQuery(document).ready(function ($) {
         const savedBy = $(this).data('draft-saved-by');
         const savedAt = $(this).data('draft-saved-at');
         const scheduledTime = $(this).data('scheduled-time');
-		const builderName = bbDraftUtility.builderName;
+        const builderName = bbDraftUtility.builderName;
         
-		let builderEditUrl = $(`tr#post-${postId} .fl-builder a`).attr('href');
-			builderEditUrl += '&fl_saved_draft'; // Append the fl_saved_draft param to the URL
+        let builderEditUrl = $(`tr#post-${postId} .fl-builder a`).attr('href');
+            builderEditUrl += '&fl_saved_draft'; // Append the fl_saved_draft param to the URL
 
 
         // Initialize the modal globally
@@ -144,61 +144,61 @@ jQuery(document).ready(function ($) {
             width: '40%',
             modal: true,
             title: 'Saved Draft',
-			draggable: false,
-			resizable: false,
-			autoFocus: false,
-			closeOnEscape: true,
-			dialogClass: "fl-saved-draft-modal",
+            draggable: false,
+            resizable: false,
+            autoFocus: false,
+            closeOnEscape: true,
+            dialogClass: "fl-saved-draft-modal",
             create: function() {
                 // Apply min-width and max-width to the dialog wrapper
                 $(this).closest('.ui-dialog').css({
                     'min-width': '300px',
                     'max-width': '600px'
                 });
-				// Replace the dialog title with an <h1> tag
+                // Replace the dialog title with an <h1> tag
                 const titleBar = $(this).closest('.ui-dialog').find('.ui-dialog-title');
                 titleBar.replaceWith(`<h1 class="ui-dialog-title">${titleBar.text()}</h1>`);
             },
             open: function() {
-				$(this).dialog("widget").find('#edit-saved-draft').blur();
-				$('.fl-saved-draft-modal').focus();
-				// Bind the overlay click to close the dialog
-				$('.ui-widget-overlay').on('click', function() {
-					modal.dialog('close');
-				});
+                $(this).dialog("widget").find('#edit-saved-draft').blur();
+                $('.fl-saved-draft-modal').focus();
+                // Bind the overlay click to close the dialog
+                $('.ui-widget-overlay').on('click', function() {
+                    modal.dialog('close');
+                });
                 // Set the scheduled time in the input field if it exists after the modal opens
                 if (scheduledTime) {
                     const scheduleInput = $('#fl-schedule-time');
                     scheduleInput.val(scheduledTime);	
                 }
             },
-			close: function() {
-				// Unbind the overlay click event when closing the dialog
-				$('.ui-widget-overlay').off('click');
-			}
+            close: function() {
+                // Unbind the overlay click event when closing the dialog
+                $('.ui-widget-overlay').off('click');
+            }
         });
 
         // Build the modal content
         let modalContent = `<p>This page has a ${builderName} Saved Draft.</p>`;
-        if (savedBy && savedAt) {
+        if (bbDraftUtility.showSavedInfo && savedBy && savedAt) {
             modalContent += `<p>Draft saved by <strong>${savedBy}</strong> on <strong>${savedAt}</strong>.</p>`;
         }
-		
-		modalContent += '<div class="draft-buttons">';
-		// Add the "Edit Saved Draft" button if the URL is available
+
+        modalContent += '<div class="draft-buttons">';
+        // Add the "Edit Saved Draft" button if the URL is available
         if (builderEditUrl) {
             modalContent += `<a href="${builderEditUrl}" class="bb-saved-draft-btn" id="edit-saved-draft">Edit Saved Draft</a>`;
         }
-		
+
         // Delete Draft button
         modalContent += '<button id="delete-saved-draft" class="bb-saved-draft-btn">Delete Draft</button>';
-		modalContent += '</div>';
+        modalContent += '</div>';
         
 
         // Conditionally show scheduling options if scheduling is enabled
         if (bbDraftUtility.enableScheduling) {
-			
-			// Add a horizontal rule
+
+            // Add a horizontal rule
         	modalContent += '<div class="schedule-draft-section"><hr>';
             modalContent += '<h2>Schedule Draft</h2>';
 
@@ -210,8 +210,8 @@ jQuery(document).ready(function ($) {
                     <input type="submit" class="bb-saved-draft-btn" value="${scheduledTime ? 'Update Schedule' : 'Schedule'}">
                 </div>
             `;
-			
-			// If there is a scheduled time, show it with unschedule button and format it
+
+            // If there is a scheduled time, show it with unschedule button and format it
             if (scheduledTime) {
                 const formattedScheduledTime = new Date(scheduledTime).toLocaleString('en-US', {
                     month: 'short',
@@ -225,7 +225,7 @@ jQuery(document).ready(function ($) {
                 modalContent += `<br><p>Currently scheduled to be published on <strong>${formattedScheduledTime}</strong>.</p>`;
                 modalContent += '<button id="unschedule-saved-draft" class="bb-saved-draft-btn">Unschedule</button>';
             }
-			modalContent += '</div>';
+            modalContent += '</div>';
         }
 
         modal.html(modalContent);

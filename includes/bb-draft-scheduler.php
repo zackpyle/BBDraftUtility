@@ -2,11 +2,6 @@
 // Scheduling: Handles scheduling Beaver Builder draft changes
 
 
-function bb_draft_utility_should_enable_scheduling() {
-    // Allow scheduling by default, but this can be overridden using the filter
-    return apply_filters( 'bb_draft_utility_enable_scheduling', true );
-}
-
 /**
  * Log a message to Simple History if available, and always log errors to the PHP error log.
  *
