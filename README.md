@@ -1,4 +1,4 @@
-# BBDraftUtility
+# Beaver Builder Draft Utility
 Provides utilities for Beaver Builder drafts, including scheduling and draft notices
 
 ## Draft Notices
