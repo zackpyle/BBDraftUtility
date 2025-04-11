@@ -2,7 +2,7 @@
 /*
 Plugin Name: Beaver Builder Drafts Utility
 Description: Provides utilities for Beaver Builder drafts, including scheduling and draft notices.
-Version: 1.3
+Version: 1.4
 Author: PYLE/DIGITAL
 */
 
@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
-define( 'BB_DRAFT_UTILITY_VERSION', '1.3' );
+define( 'BB_DRAFT_UTILITY_VERSION', '1.4' );
 define( 'BB_DRAFT_UTILITY_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'BB_DRAFT_UTILITY_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 
