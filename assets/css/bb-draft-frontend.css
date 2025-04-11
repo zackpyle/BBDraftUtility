@@ -45,6 +45,8 @@
 	text-align: center;
 	transition-property: all;
 	transition-duration: .2s;
+	height: unset;
+	box-shadow: none;
 }
 
 .bb-draft-modal .ui-dialog-buttonpane button:is(:hover, :focus-visible) {
@@ -53,7 +55,6 @@
 }
 .ui-dialog .ui-dialog-buttonpane button{
 	margin-inline: 0 !important;
-	height: unset;
 }
 .bb-draft-modal.ui-dialog .ui-dialog-buttonpane{
 	margin: 0;

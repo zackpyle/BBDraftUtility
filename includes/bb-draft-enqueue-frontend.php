@@ -15,13 +15,16 @@ function bb_draft_maybe_load_scripts() {
         $scheduled_time = get_post_meta( $post->ID, '_fl_builder_schedule', true );
         $draft_saved_by = get_post_meta( $post->ID, '_fl_builder_draft_saved_by', true );
         $draft_saved_at = get_post_meta( $post->ID, '_fl_builder_draft_saved_at', true );
+		
+		// Check if it's a new page
+    	$is_new_page = empty( $live ) && empty( $draft );
 
         // Get the user info from the user ID
         $user_info = $draft_saved_by ? get_userdata( $draft_saved_by ) : null;
         $saved_by_name = $user_info ? $user_info->user_login : '';
 
-        // Check if there are unpublished changes (i.e., draft exists and differs from live data)
-        if ( '' !== $draft && $draft != $live ) {
+    	// Only proceed if the draft actually differs from live and it's not a brand new page
+        if ( '' !== $draft && $draft != $live && ! $is_new_page ) {
             // Prepare localized data
             $localized_data = array(
                 'hasDraft'       => true,

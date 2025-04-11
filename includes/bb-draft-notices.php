@@ -19,27 +19,34 @@ add_filter( 'display_post_states', function( $post_states, $post ) {
         $formatted_saved_at = $draft_saved_at ? date( 'M j, Y, H:i', strtotime( $draft_saved_at ) ) : '';
 
         // If there are unpublished changes, display the post state
-        if ( '' !== $draft && $draft != $live ) {
-            // Always display the draft information link
-            $post_states['bb_draft'] = '<a class="fl-saved-draft" data-post-id="' . esc_attr( $post->ID ) . '" 
-                                        data-scheduled-time="' . esc_attr( $scheduled_time ) . '" 
-                                        data-draft-saved-by="' . esc_attr( $saved_by_name ) . '" 
-                                        data-draft-saved-at="' . esc_attr( $formatted_saved_at ) . '">Saved Draft';
+		if ( '' !== $draft && $draft != $live ) {
+			// Always display the draft information link
+			$post_states['bb_draft'] = '<a class="fl-saved-draft" 
+				data-post-id="' . esc_attr( $post->ID ) . '" 
+				data-scheduled-time="' . esc_attr( $scheduled_time ) . '" 
+				data-draft-saved-by="' . esc_attr( $saved_by_name ) . '" 
+				data-draft-saved-at="' . esc_attr( $formatted_saved_at ) . '">Saved Draft';
 
-            // Only display the calendar icon if scheduling is enabled and there is a scheduled time
-            if ( $enable_scheduling && $scheduled_time ) {
-                try {
-                    $dt_utc = new DateTimeImmutable( $scheduled_time, new DateTimeZone( 'UTC' ) );
-                    $dt_local = $dt_utc->setTimezone( wp_timezone() );
-                    $formatted_time = $dt_local->format( 'M j, Y H:i' );
-                } catch ( Exception $e ) {
-                    $formatted_time = $scheduled_time;
-                }
-                $post_states['bb_draft'] .= ' <span class="dashicons dashicons-calendar-alt" title="Scheduled for ' . esc_attr( $formatted_time ) . '" data-scheduled-time="' . esc_attr( $scheduled_time ) . '"></span>';
-            }
+			// Only display the calendar icon if scheduling is enabled and there is a scheduled time
+			if ( $enable_scheduling && $scheduled_time ) {
+				try {
+					$timezone      = wp_timezone();
+					$timezone_name = $timezone->getName();
+					$dt_utc        = new DateTimeImmutable( $scheduled_time, new DateTimeZone( 'UTC' ) );
+					$dt_local      = $dt_utc->setTimezone( $timezone );
+					$formatted_time = $dt_local->format( 'M j, Y H:i' ) . ' (' . $timezone_name . ')';
+				} catch ( Exception $e ) {
+					$formatted_time = $scheduled_time;
+				}
 
-            $post_states['bb_draft'] .= '</a>'; // Close the anchor tag
-        }
+				$post_states['bb_draft'] .= ' <span class="dashicons dashicons-calendar-alt" 
+					title="Scheduled for ' . esc_attr( $formatted_time ) . '" 
+					data-scheduled-time="' . esc_attr( $scheduled_time ) . '"></span>';
+			}
+
+			$post_states['bb_draft'] .= '</a>'; // Close the anchor tag
+		}
+
     }
     return $post_states;
 }, 1000, 2 );
@@ -143,19 +150,31 @@ add_action( 'admin_notices', function() {
 
 // Record who saved the Saved Draft
 add_action( 'fl_builder_after_save_draft', function( $post_id ) {
-    // Save the current user ID and timestamp when the draft is saved
+    // Save the current user ID
     $user_id = get_current_user_id();
-    $timestamp = current_time( 'mysql' );
 
+    // Get the current UTC timestamp and format it as Y-m-d H:i:s
+    $timestamp = current_time( 'timestamp', true ); // true = get time in UTC
+    $datetime_utc = gmdate( 'Y-m-d H:i:s', $timestamp );
+
+    // Save the user and UTC timestamp to post meta
     update_post_meta( $post_id, '_fl_builder_draft_saved_by', $user_id );
-    update_post_meta( $post_id, '_fl_builder_draft_saved_at', $timestamp );
+    update_post_meta( $post_id, '_fl_builder_draft_saved_at', $datetime_utc );
 
-    // Get the user info from the user ID
+    // Get the user info from the user ID for logging
     $user_info = get_userdata( $user_id );
     $saved_by_name = $user_info ? $user_info->display_name : 'Unknown';
 
     // Log the draft save event to Simple History
     if ( function_exists( 'bb_draft_utility_log' ) ) {
-        bb_draft_utility_log( sprintf( 'Draft for Post ID %d was saved by %s on %s.', $post_id, $saved_by_name, $timestamp ), 'info' );
+        bb_draft_utility_log(
+            sprintf(
+                'Draft for Post ID %d was saved by %s on %s (UTC).',
+                $post_id,
+                $saved_by_name,
+                $datetime_utc
+            ),
+            'info'
+        );
     }
 });

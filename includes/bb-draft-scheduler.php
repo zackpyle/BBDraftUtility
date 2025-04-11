@@ -33,17 +33,17 @@ add_action( 'wp_ajax_fl_schedule_changes', function() {
         wp_send_json_error( 'Invalid data' );
     }
 
-    // Convert the scheduled time to a UTC Unix timestamp
-	try {
-		$datetime = new DateTimeImmutable( $scheduled_time, new DateTimeZone( 'UTC' ) );
-		$timestamp = $datetime->getTimestamp();
+    // Convert the scheduled time (ISO 8601 in UTC) to server-local timestamp
+    try {
+		$datetime_server = new DateTimeImmutable( $scheduled_time, wp_timezone() );
+		$timestamp = $datetime_server->getTimestamp();
 	} catch ( Exception $e ) {
 		bb_draft_utility_log( "Failed to parse datetime. Error: {$e->getMessage()}", 'error' );
 		wp_send_json_error( 'Invalid datetime format.' );
 	}
 
-	// Compare to current server time (still in local time)
-	$current_time = current_time( 'timestamp' );
+    // Compare to current server time (still in local time)
+    $current_time = current_time( 'timestamp' );
 
     // Clear any existing scheduled events for this hook and post ID
     wp_clear_scheduled_hook( 'publish_bb_draft_changes', array( $post_id ) );
@@ -52,7 +52,7 @@ add_action( 'wp_ajax_fl_schedule_changes', function() {
     $event_scheduled = wp_schedule_single_event( $timestamp, 'publish_bb_draft_changes', array( $post_id ) );
 
     if ( $event_scheduled ) {
-        // Store the scheduled time in post meta for reference
+        // Store the scheduled time in post meta for reference (keep it in UTC string form)
         update_post_meta( $post_id, '_fl_builder_schedule', $scheduled_time );
         bb_draft_utility_log( "Scheduled draft to for Post ID: $post_id. Scheduled Time: $scheduled_time.", 'success' );
         wp_send_json_success( 'Changes scheduled successfully.' );
@@ -102,7 +102,7 @@ add_action( 'wp_ajax_fl_delete_draft', function() {
     // Delete draft data
     $deleted_draft = delete_post_meta( $post_id, '_fl_builder_draft' );
     $deleted_draft_settings = delete_post_meta( $post_id, '_fl_builder_draft_settings' );
-	delete_post_meta( $post_id, '_fl_builder_draft_saved_by' );
+    delete_post_meta( $post_id, '_fl_builder_draft_saved_by' );
     delete_post_meta( $post_id, '_fl_builder_draft_saved_at' );
 
     // Log what was actually deleted
@@ -120,7 +120,7 @@ add_action( 'wp_ajax_fl_delete_draft', function() {
 
     // Only send success response if both meta fields were deleted
     if ( $deleted_draft && $deleted_draft_settings ) {
-		bb_draft_utility_log( "Deleted saved draft for Post ID: $post_id.", 'success' );
+        bb_draft_utility_log( "Deleted saved draft for Post ID: $post_id.", 'success' );
         wp_send_json_success( 'Saved draft deleted.' );
     } else {
         wp_send_json_error( 'Failed to delete the draft completely.' );
@@ -137,10 +137,10 @@ add_action( 'publish_bb_draft_changes', function( $post_id ) {
 
     if ( ! empty( $draft_data ) ) {
         update_post_meta( $post_id, '_fl_builder_data', $draft_data );
-        
-		if ( ! empty( $draft_settings ) ) {
-			update_post_meta( $post_id, '_fl_builder_data_settings', $draft_settings );
-		}
+
+        if ( ! empty( $draft_settings ) ) {
+            update_post_meta( $post_id, '_fl_builder_data_settings', $draft_settings );
+        }
 
         // Log successful publication of the draft
         bb_draft_utility_log( "Published draft changes for Post ID: $post_id.", 'success' );
@@ -148,11 +148,11 @@ add_action( 'publish_bb_draft_changes', function( $post_id ) {
         // Delete the draft data as we already published it
         delete_post_meta( $post_id, '_fl_builder_draft' );
         delete_post_meta( $post_id, '_fl_builder_draft_settings' );
-		delete_post_meta( $post_id, '_fl_builder_draft_saved_by' );
-    	delete_post_meta( $post_id, '_fl_builder_draft_saved_at' );
+        delete_post_meta( $post_id, '_fl_builder_draft_saved_by' );
+        delete_post_meta( $post_id, '_fl_builder_draft_saved_at' );
     } else {
         // Log if there was an issue with the draft data
-		bb_draft_utility_log( "Failed to publish draft changes for Post ID: $post_id. Missing draft data.", 'error' );
+        bb_draft_utility_log( "Failed to publish draft changes for Post ID: $post_id. Missing draft data.", 'error' );
     }
 
     // Clean up the scheduled time meta field
