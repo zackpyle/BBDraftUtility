@@ -53,6 +53,7 @@
 }
 .ui-dialog .ui-dialog-buttonpane button{
 	margin-inline: 0 !important;
+	height: unset;
 }
 .bb-draft-modal.ui-dialog .ui-dialog-buttonpane{
 	margin: 0;

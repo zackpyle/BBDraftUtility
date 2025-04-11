@@ -135,9 +135,12 @@ add_action( 'publish_bb_draft_changes', function( $post_id ) {
     $draft_data = get_post_meta( $post_id, '_fl_builder_draft', true );
     $draft_settings = get_post_meta( $post_id, '_fl_builder_draft_settings', true );
 
-    if ( ! empty( $draft_data ) && ! empty( $draft_settings ) ) {
+    if ( ! empty( $draft_data ) ) {
         update_post_meta( $post_id, '_fl_builder_data', $draft_data );
-        update_post_meta( $post_id, '_fl_builder_data_settings', $draft_settings );
+        
+		if ( ! empty( $draft_settings ) ) {
+			update_post_meta( $post_id, '_fl_builder_data_settings', $draft_settings );
+		}
 
         // Log successful publication of the draft
         bb_draft_utility_log( "Published draft changes for Post ID: $post_id.", 'success' );
@@ -149,7 +152,7 @@ add_action( 'publish_bb_draft_changes', function( $post_id ) {
     	delete_post_meta( $post_id, '_fl_builder_draft_saved_at' );
     } else {
         // Log if there was an issue with the draft data
-        bb_draft_utility_log( "Failed to publish draft changes for Post ID: $post_id. Missing draft data or settings.", 'error' );
+		bb_draft_utility_log( "Failed to publish draft changes for Post ID: $post_id. Missing draft data.", 'error' );
     }
 
     // Clean up the scheduled time meta field
