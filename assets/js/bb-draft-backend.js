@@ -13,7 +13,7 @@ jQuery(document).ready(function ($) {
         if (!$('#bb-draft-notification').length) {
             $('body').append('<div id="bb-draft-notification" style="display:none;"></div>');
         }
-        
+
         const notificationDialog = $('#bb-draft-notification');
 
         // Close the specified modal before showing the notification
@@ -41,27 +41,26 @@ jQuery(document).ready(function ($) {
             closeOnEscape: true,
             draggable: false,
             resizable: false,
-            width: '40%',   // Set to 40% width
+            width: '40%',
             dialogClass: "fl-saved-draft-modal",
             create: function() {
-                // Apply min-width and max-width to the actual dialog wrapper
                 $(this).closest('.ui-dialog').css({
                     'min-width': '300px',
                     'max-width': '600px'
                 });
-                // Replace the dialog title with an <h1> tag
                 const titleBar = $(this).closest('.ui-dialog').find('.ui-dialog-title');
                 titleBar.replaceWith(`<h1 class="ui-dialog-title">${titleBar.text()}</h1>`);
             }
         });
     }
-	// Function to show confirmation modal
+
+    // Function to show confirmation modal
     function showConfirmation(message, title = 'Confirmation', onConfirm = null, onCancel = null, modalToClose = null) {
         // Check if the confirmation modal exists, if not, create it
         if (!$('#bb-draft-confirmation').length) {
             $('body').append('<div id="bb-draft-confirmation" style="display:none;"></div>');
         }
-        
+
         const confirmationDialog = $('#bb-draft-confirmation');
 
         // Close the specified modal before showing the confirmation
@@ -100,13 +99,11 @@ jQuery(document).ready(function ($) {
             width: '40%',
             dialogClass: "fl-saved-draft-modal",
             create: function() {
-                // Apply min-width and max-width to the actual dialog wrapper
                 $(this).closest('.ui-dialog').css({
                     'min-width': '270px',
                     'max-width': '450px'
                 });
 
-                // Replace the dialog title with an <h1> tag
                 const titleBar = $(this).closest('.ui-dialog').find('.ui-dialog-title');
                 titleBar.replaceWith(`<h1 class="ui-dialog-title">${titleBar.text()}</h1>`);
             }
@@ -132,10 +129,9 @@ jQuery(document).ready(function ($) {
         const savedAt = $(this).data('draft-saved-at');
         const scheduledTime = $(this).data('scheduled-time');
         const builderName = bbDraftUtility.builderName;
-        
+
         let builderEditUrl = $(`tr#post-${postId} .fl-builder a`).attr('href');
             builderEditUrl += '&fl_saved_draft'; // Append the fl_saved_draft param to the URL
-
 
         // Initialize the modal globally
         modal = $('<div id="fl-saved-draft-modal-content"></div>').dialog({
@@ -150,12 +146,10 @@ jQuery(document).ready(function ($) {
             closeOnEscape: true,
             dialogClass: "fl-saved-draft-modal",
             create: function() {
-                // Apply min-width and max-width to the dialog wrapper
                 $(this).closest('.ui-dialog').css({
                     'min-width': '300px',
                     'max-width': '600px'
                 });
-                // Replace the dialog title with an <h1> tag
                 const titleBar = $(this).closest('.ui-dialog').find('.ui-dialog-title');
                 titleBar.replaceWith(`<h1 class="ui-dialog-title">${titleBar.text()}</h1>`);
             },
@@ -169,7 +163,7 @@ jQuery(document).ready(function ($) {
                 // Set the scheduled time in the input field if it exists after the modal opens
                 if (scheduledTime) {
                     const scheduleInput = $('#fl-schedule-time');
-                    scheduleInput.val(scheduledTime);	
+                    scheduleInput.val(scheduledTime);    
                 }
             },
             close: function() {
@@ -193,15 +187,11 @@ jQuery(document).ready(function ($) {
         // Delete Draft button
         modalContent += '<button id="delete-saved-draft" class="bb-saved-draft-btn">Delete Draft</button>';
         modalContent += '</div>';
-        
 
         // Conditionally show scheduling options if scheduling is enabled
         if (bbDraftUtility.enableScheduling) {
-
-            // Add a horizontal rule
-        	modalContent += '<div class="schedule-draft-section"><hr>';
+            modalContent += '<div class="schedule-draft-section"><hr>';
             modalContent += '<h2>Schedule Draft</h2>';
-
 
             // Input and Schedule button
             modalContent += `
@@ -231,15 +221,17 @@ jQuery(document).ready(function ($) {
         modal.html(modalContent);
         modal.dialog('open');
 
-        // Handle scheduling if enabled
+		// Handle scheduling if enabled
         if (bbDraftUtility.enableScheduling) {
             modal.find('input[type="submit"]').on('click', function(e) {
                 e.preventDefault();
-                const scheduledTimeString = modal.find('#fl-schedule-time').val();
-                const scheduledTime = new Date(scheduledTimeString);
+                const localDateString = modal.find('#fl-schedule-time').val();
+                const utcDateString = new Date(localDateString).toISOString();
 
-                if (scheduledTime) {
-                    if (scheduledTime <= new Date(bbDraftUtility.serverTime)) {
+                if (localDateString) {
+                    const serverTime = new Date(bbDraftUtility.serverTime);
+
+                    if (new Date(localDateString) <= serverTime) {
                         showNotification('Please select a time that is after the current server time.', 'Error', null, modal);
                         return;
                     }
@@ -252,7 +244,7 @@ jQuery(document).ready(function ($) {
                             action: 'fl_schedule_changes',
                             nonce: nonce,
                             post_id: postId,
-                            scheduled_time: scheduledTimeString
+                            scheduled_time: utcDateString
                         },
                         success: function(response) {
                             if (response.success) {

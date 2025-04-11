@@ -41,7 +41,7 @@ jQuery(document).ready(function ($) {
                 },
                 closeOnEscape: true,
                 open: function(event, ui) {
-                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide(); // Hide the close button
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
                 },
                 draggable: false,
                 resizable: false,
@@ -60,7 +60,15 @@ jQuery(document).ready(function ($) {
 
         // If there's a scheduled time, inform the user
         if (bbDraftUtility.scheduledTime) {
-            modalContent += ` It is scheduled to be published on <strong>${bbDraftUtility.scheduledTime}</strong>.`;
+            const localScheduledTime = new Date(bbDraftUtility.scheduledTime).toLocaleString('en-US', {
+				month: 'short',
+				day: 'numeric',
+				year: 'numeric',
+				hour: '2-digit',
+				minute: '2-digit',
+				hour12: false
+			});
+			modalContent += ` It is scheduled to be published on <strong>${localScheduledTime}</strong>.`;
         }
 
         modalContent += '</p><p>Would you like to continue editing this saved draft OR delete the saved draft and start editing the currently published version?</p>';
@@ -103,7 +111,6 @@ jQuery(document).ready(function ($) {
             draggable: false,
             resizable: false,
             create: function() {
-                // Add custom classes to buttons
                 $(".ui-dialog-buttonpane button:contains('Edit Saved Draft')").addClass("continue-editing-btn");
                 $(".ui-dialog-buttonpane button:contains('Delete Saved Draft')").addClass("delete-draft-btn");
             }

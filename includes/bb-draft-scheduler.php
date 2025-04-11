@@ -33,14 +33,17 @@ add_action( 'wp_ajax_fl_schedule_changes', function() {
         wp_send_json_error( 'Invalid data' );
     }
 
-    // Convert the scheduled time to a Unix timestamp based on server time
-    $timestamp = strtotime( $scheduled_time );
-    $current_time = strtotime( current_time( 'Y-m-d H:i:s' ) );
+    // Convert the scheduled time to a UTC Unix timestamp
+	try {
+		$datetime = new DateTimeImmutable( $scheduled_time, new DateTimeZone( 'UTC' ) );
+		$timestamp = $datetime->getTimestamp();
+	} catch ( Exception $e ) {
+		bb_draft_utility_log( "Failed to parse datetime. Error: {$e->getMessage()}", 'error' );
+		wp_send_json_error( 'Invalid datetime format.' );
+	}
 
-    if ( ! $timestamp || $timestamp <= $current_time ) {
-        bb_draft_utility_log( "Failed to schedule draft: Invalid or past date/time. Post ID: $post_id, Scheduled Time: $scheduled_time", 'error' );
-        wp_send_json_error( 'Invalid or past date/time.' );
-    }
+	// Compare to current server time (still in local time)
+	$current_time = current_time( 'timestamp' );
 
     // Clear any existing scheduled events for this hook and post ID
     wp_clear_scheduled_hook( 'publish_bb_draft_changes', array( $post_id ) );

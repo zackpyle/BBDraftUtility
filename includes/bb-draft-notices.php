@@ -28,8 +28,13 @@ add_filter( 'display_post_states', function( $post_states, $post ) {
 
             // Only display the calendar icon if scheduling is enabled and there is a scheduled time
             if ( $enable_scheduling && $scheduled_time ) {
-                $formatted_time = date( 'M j, Y H:i', strtotime( $scheduled_time ) );
-                // Store the scheduled time in the dashicon's data attribute
+                try {
+                    $dt_utc = new DateTimeImmutable( $scheduled_time, new DateTimeZone( 'UTC' ) );
+                    $dt_local = $dt_utc->setTimezone( wp_timezone() );
+                    $formatted_time = $dt_local->format( 'M j, Y H:i' );
+                } catch ( Exception $e ) {
+                    $formatted_time = $scheduled_time;
+                }
                 $post_states['bb_draft'] .= ' <span class="dashicons dashicons-calendar-alt" title="Scheduled for ' . esc_attr( $formatted_time ) . '" data-scheduled-time="' . esc_attr( $scheduled_time ) . '"></span>';
             }
 
@@ -38,7 +43,6 @@ add_filter( 'display_post_states', function( $post_states, $post ) {
     }
     return $post_states;
 }, 1000, 2 );
-
 
 
 // Change the green dot to yellow in the admin bar too
@@ -95,7 +99,6 @@ add_action( 'admin_notices', function() {
 
             // Append "Saved by" and "Saved at" information
             if ( $saved_by && $saved_at ) {
-                // Get user information
                 $user_info = get_userdata( $saved_by );
                 $saved_by_name = $user_info ? $user_info->user_login : __( 'Unknown User', 'fl-builder' );
                 $formatted_saved_at = date( 'M j, Y H:i', strtotime( $saved_at ) );
@@ -105,10 +108,17 @@ add_action( 'admin_notices', function() {
 
             // If there is a scheduled time, append it to the message
             if ( $scheduled_time ) {
-                $formatted_time = date( 'M j, Y H:i', strtotime( $scheduled_time ) );
+                try {
+                    $dt_utc = new DateTimeImmutable( $scheduled_time, new DateTimeZone( 'UTC' ) );
+                    $dt_local = $dt_utc->setTimezone( wp_timezone() );
+                    $formatted_time = $dt_local->format( 'M j, Y H:i' );
+                } catch ( Exception $e ) {
+                    $formatted_time = $scheduled_time;
+                }
                 $message .= sprintf( ' It is scheduled to be published on %s.', esc_html( $formatted_time ) );
             }
-            $type    = 'warning';
+
+            $type = 'warning';
 
             echo '<div class="notice notice-' . esc_attr( $type ) . ' is-dismissible">';
             echo wpautop( esc_html( $message ) );
