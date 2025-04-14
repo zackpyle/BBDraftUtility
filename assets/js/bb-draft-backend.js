@@ -8,12 +8,13 @@ jQuery(document).ready(function ($) {
     }
     initializeTooltips();
 
+    // Function to show notifications
     function showNotification(message, title = 'Notification', callback = null, modalToClose = null) {
         // Check if the notification modal exists, if not, create it
         if (!$('#bb-draft-notification').length) {
             $('body').append('<div id="bb-draft-notification" style="display:none;"></div>');
         }
-        
+
         const notificationDialog = $('#bb-draft-notification');
 
         // Close the specified modal before showing the notification
@@ -21,9 +22,15 @@ jQuery(document).ready(function ($) {
             modalToClose.dialog("close");
         }
 
-        // Set the title and message
-        notificationDialog.attr('title', title);
-        notificationDialog.text(message);
+        // Set the message
+		notificationDialog.text(message);
+
+		// If the dialog has already been initialized, update its title
+		if (notificationDialog.hasClass('ui-dialog-content')) {
+			notificationDialog.dialog('option', 'title', title);
+		} else {
+			notificationDialog.attr('title', title); // for first-time init
+		}
 
         // Initialize the dialog
         notificationDialog.dialog({
@@ -31,37 +38,29 @@ jQuery(document).ready(function ($) {
             buttons: {
                 Ok: function () {
                     $(this).dialog("close");
-
-                    // If there's a callback, execute it after the dialog is closed
-                    if (callback) {
-                        callback();
-                    }
+                    if (callback) callback();
                 }
             },
             closeOnEscape: true,
             draggable: false,
             resizable: false,
-            width: '40%',   // Set to 40% width
+            width: '40%',
             dialogClass: "fl-saved-draft-modal",
             create: function() {
-                // Apply min-width and max-width to the actual dialog wrapper
-                $(this).closest('.ui-dialog').css({
-                    'min-width': '300px',
-                    'max-width': '600px'
-                });
-                // Replace the dialog title with an <h1> tag
+                $(this).closest('.ui-dialog').css({ 'min-width': '300px', 'max-width': '600px' });
                 const titleBar = $(this).closest('.ui-dialog').find('.ui-dialog-title');
                 titleBar.replaceWith(`<h1 class="ui-dialog-title">${titleBar.text()}</h1>`);
             }
         });
     }
-	// Function to show confirmation modal
+
+    // Function to show confirmation modal
     function showConfirmation(message, title = 'Confirmation', onConfirm = null, onCancel = null, modalToClose = null) {
         // Check if the confirmation modal exists, if not, create it
         if (!$('#bb-draft-confirmation').length) {
             $('body').append('<div id="bb-draft-confirmation" style="display:none;"></div>');
         }
-        
+
         const confirmationDialog = $('#bb-draft-confirmation');
 
         // Close the specified modal before showing the confirmation
@@ -79,19 +78,11 @@ jQuery(document).ready(function ($) {
             buttons: {
                 "Yes": function () {
                     $(this).dialog("close");
-
-                    // Execute the confirm callback if provided
-                    if (onConfirm) {
-                        onConfirm();
-                    }
+                    if (onConfirm) onConfirm();
                 },
                 "No": function () {
                     $(this).dialog("close");
-
-                    // Execute the cancel callback if provided
-                    if (onCancel) {
-                        onCancel();
-                    }
+                    if (onCancel) onCancel();
                 }
             },
             closeOnEscape: true,
@@ -100,13 +91,7 @@ jQuery(document).ready(function ($) {
             width: '40%',
             dialogClass: "fl-saved-draft-modal",
             create: function() {
-                // Apply min-width and max-width to the actual dialog wrapper
-                $(this).closest('.ui-dialog').css({
-                    'min-width': '270px',
-                    'max-width': '450px'
-                });
-
-                // Replace the dialog title with an <h1> tag
+                $(this).closest('.ui-dialog').css({ 'min-width': '270px', 'max-width': '450px' });
                 const titleBar = $(this).closest('.ui-dialog').find('.ui-dialog-title');
                 titleBar.replaceWith(`<h1 class="ui-dialog-title">${titleBar.text()}</h1>`);
             }
@@ -132,10 +117,9 @@ jQuery(document).ready(function ($) {
         const savedAt = $(this).data('draft-saved-at');
         const scheduledTime = $(this).data('scheduled-time');
         const builderName = bbDraftUtility.builderName;
-        
-        let builderEditUrl = $(`tr#post-${postId} .fl-builder a`).attr('href');
-            builderEditUrl += '&fl_saved_draft'; // Append the fl_saved_draft param to the URL
 
+        let builderEditUrl = $(`tr#post-${postId} .fl-builder a`).attr('href');
+        builderEditUrl += '&fl_saved_draft'; // Append the fl_saved_draft param to the URL
 
         // Initialize the modal globally
         modal = $('<div id="fl-saved-draft-modal-content"></div>').dialog({
@@ -150,12 +134,7 @@ jQuery(document).ready(function ($) {
             closeOnEscape: true,
             dialogClass: "fl-saved-draft-modal",
             create: function() {
-                // Apply min-width and max-width to the dialog wrapper
-                $(this).closest('.ui-dialog').css({
-                    'min-width': '300px',
-                    'max-width': '600px'
-                });
-                // Replace the dialog title with an <h1> tag
+                $(this).closest('.ui-dialog').css({ 'min-width': '300px', 'max-width': '600px' });
                 const titleBar = $(this).closest('.ui-dialog').find('.ui-dialog-title');
                 titleBar.replaceWith(`<h1 class="ui-dialog-title">${titleBar.text()}</h1>`);
             },
@@ -167,10 +146,14 @@ jQuery(document).ready(function ($) {
                     modal.dialog('close');
                 });
                 // Set the scheduled time in the input field if it exists after the modal opens
-                if (scheduledTime) {
-                    const scheduleInput = $('#fl-schedule-time');
-                    scheduleInput.val(scheduledTime);	
-                }
+				if (scheduledTime) {
+					const utcDate = new Date(scheduledTime);
+					const offsetMs = utcDate.getTimezoneOffset() * 60000;
+					const localDate = new Date(utcDate.getTime() - offsetMs);
+					const formattedForInput = localDate.toISOString().slice(0, 16); // datetime-local format
+					$('#fl-schedule-time').val(formattedForInput);
+				}
+
             },
             close: function() {
                 // Unbind the overlay click event when closing the dialog
@@ -181,8 +164,22 @@ jQuery(document).ready(function ($) {
         // Build the modal content
         let modalContent = `<p>This page has a ${builderName} Saved Draft.</p>`;
         if (bbDraftUtility.showSavedInfo && savedBy && savedAt) {
-            modalContent += `<p>Draft saved by <strong>${savedBy}</strong> on <strong>${savedAt}</strong>.</p>`;
-        }
+			const isoString = savedAt.replace(' ', 'T') + ':00Z';
+			const localSavedDate = new Date(isoString);
+
+			const formattedSavedAt = localSavedDate.toLocaleString('en-US', {
+				month: 'short',
+				day: 'numeric',
+				year: 'numeric',
+				hour: '2-digit',
+				minute: '2-digit',
+				hour12: false
+			});
+
+			const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+			modalContent += `<p>Draft saved by <strong>${savedBy}</strong> on <strong>${formattedSavedAt} (${timezone})</strong>.</p>`;
+		}
+
 
         modalContent += '<div class="draft-buttons">';
         // Add the "Edit Saved Draft" button if the URL is available
@@ -193,15 +190,13 @@ jQuery(document).ready(function ($) {
         // Delete Draft button
         modalContent += '<button id="delete-saved-draft" class="bb-saved-draft-btn">Delete Draft</button>';
         modalContent += '</div>';
-        
 
         // Conditionally show scheduling options if scheduling is enabled
         if (bbDraftUtility.enableScheduling) {
-
-            // Add a horizontal rule
-        	modalContent += '<div class="schedule-draft-section"><hr>';
+            modalContent += '<div class="schedule-draft-section"><hr>';
             modalContent += '<h2>Schedule Draft</h2>';
-
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            modalContent += `<p class="user-timezone">Time shown is in your local timezone: <strong>${tz}</strong></p>`;
 
             // Input and Schedule button
             modalContent += `
@@ -210,7 +205,7 @@ jQuery(document).ready(function ($) {
                     <input type="submit" class="bb-saved-draft-btn" value="${scheduledTime ? 'Update Schedule' : 'Schedule'}">
                 </div>
             `;
-
+            
             // If there is a scheduled time, show it with unschedule button and format it
             if (scheduledTime) {
                 const formattedScheduledTime = new Date(scheduledTime).toLocaleString('en-US', {
@@ -221,8 +216,7 @@ jQuery(document).ready(function ($) {
                     minute: '2-digit',
                     hour12: false
                 });
-
-                modalContent += `<br><p>Currently scheduled to be published on <strong>${formattedScheduledTime}</strong>.</p>`;
+                modalContent += `<br><p>Currently scheduled to be published on <strong>${formattedScheduledTime}</strong> <em>(${Intl.DateTimeFormat().resolvedOptions().timeZone})</em>.</p>`;
                 modalContent += '<button id="unschedule-saved-draft" class="bb-saved-draft-btn">Unschedule</button>';
             }
             modalContent += '</div>';
@@ -235,11 +229,13 @@ jQuery(document).ready(function ($) {
         if (bbDraftUtility.enableScheduling) {
             modal.find('input[type="submit"]').on('click', function(e) {
                 e.preventDefault();
-                const scheduledTimeString = modal.find('#fl-schedule-time').val();
-                const scheduledTime = new Date(scheduledTimeString);
+                const inputVal = modal.find('#fl-schedule-time').val();
+                const localDate = new Date(inputVal); // input in local time
+                const utcDateString = localDate.toISOString(); // convert to UTC ISO string
 
-                if (scheduledTime) {
-                    if (scheduledTime <= new Date(bbDraftUtility.serverTime)) {
+                if (inputVal) {
+                    const serverNow = new Date(bbDraftUtility.serverTime);
+                    if (localDate <= serverNow) {
                         showNotification('Please select a time that is after the current server time.', 'Error', null, modal);
                         return;
                     }
@@ -252,7 +248,7 @@ jQuery(document).ready(function ($) {
                             action: 'fl_schedule_changes',
                             nonce: nonce,
                             post_id: postId,
-                            scheduled_time: scheduledTimeString
+                            scheduled_time: utcDateString
                         },
                         success: function(response) {
                             if (response.success) {
@@ -275,7 +271,7 @@ jQuery(document).ready(function ($) {
             // Remove scheduled publishing
             modal.find('#unschedule-saved-draft').on('click', function(e) {
                 e.preventDefault();
-
+                
                 const nonce = bbDraftUtility.nonce;
                 jQuery.ajax({
                     url: bbDraftUtility.ajaxUrl,
@@ -304,7 +300,7 @@ jQuery(document).ready(function ($) {
         // Delete saved draft with confirmation
         modal.find('#delete-saved-draft').on('click', function(e) {
             e.preventDefault();
-
+            
             // Show confirmation dialog before proceeding
             showConfirmation('Are you sure you want to delete this Saved Draft? This action cannot be undone.', 'Confirm Delete', function() {
                 // If confirmed, proceed with draft deletion
